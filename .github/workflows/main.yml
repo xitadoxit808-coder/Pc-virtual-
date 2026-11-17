@@ -1,0 +1,40 @@
+# Pc virtual simples em Python
+
+class PCVirtual:
+    def __init__(self, tam_memoria=256):
+        self.reg = {"A": 0, "B": 0}           # registradores
+        self.mem = [("HALT",)] * tam_memoria  # memória (guarda o programa)
+        self.pc = 0                           # contador de programa
+        self.ligado = True
+
+    def carregar(self, programa):
+        self.mem[:len(programa)] = programa
+
+    def executar(self):
+        while self.ligado:
+            op, *args = self.mem[self.pc]     # busca a instrução
+            self.pc += 1
+            if op == "LOAD":                  # LOAD reg, valor
+                self.reg[args[0]] = args[1]
+            elif op == "ADD":                 # ADD destino, origem
+                self.reg[args[0]] += self.reg[args[1]]
+            elif op == "PRINT":               # PRINT reg
+                print(f"Saída de {args[0]}: {self.reg[args[0]]}")
+            elif op == "JUMP":                # JUMP endereço
+                self.pc = args[0]
+            elif op == "HALT":
+                self.ligado = False
+            else:
+                raise ValueError(f"Instrução inválida: {op}")
+
+
+if __name__ == "__main__":
+    pc = PCVirtual()
+    pc.carregar([
+        ("LOAD", "A", 5),
+        ("LOAD", "B", 7),
+        ("ADD", "A", "B"),
+        ("PRINT", "A"),
+        ("HALT",),
+    ])
+    pc.executar()
